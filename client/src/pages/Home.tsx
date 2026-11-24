@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import {
+  Activity,
   ArrowDownRight,
   ArrowUp,
   ArrowUpRight,
@@ -12,10 +13,12 @@ import {
   CircuitBoard,
   Code2,
   Cpu,
+  Database,
   ExternalLink,
   Github,
   Globe2,
   GraduationCap,
+  Layers,
   Linkedin,
   Mail,
   Menu,
@@ -59,23 +62,28 @@ const assets = {
   codeVisual: "/assets/code-lab.jpg",
   coupling: "/assets/coupling.jpeg",
   aerospace: "/assets/aerospace.jpg",
+  dsAi: "/assets/ds-ai-chip.jpg",
+  dsGlobe: "/assets/ds-data-globe.jpg",
+  dsAnalytics: "/assets/ds-analytics.jpg",
+  dsGlobal: "/assets/ds-globalization.jpg",
+  dsHumanAi: "/assets/ds-human-ai.jpg",
 };
 
 type Language = "es" | "en";
-type ProjectFilter = "all" | "instrumentation" | "electronics" | "robotics";
+type ProjectFilter = "all" | "datascience" | "instrumentation" | "electronics" | "robotics";
 
 const copy = {
   es: {
-    nav: { home: "Inicio", focus: "Enfoque", research: "Investigación", work: "Proyectos", skills: "Idiomas", contact: "Contacto" },
+    nav: { home: "Inicio", focus: "Enfoque", research: "Investigación", work: "Proyectos", datascience: "Datos e IA", skills: "Idiomas", contact: "Contacto" },
     hero: {
-      eyebrow: "Ingeniería física · Investigación aplicada",
-      titleStart: "Instrumentación que",
-      titleAccent: "convierte datos en decisiones.",
-      body: "Ingeniero Físico enfocado en instrumentación, electrónica, eléctrica y biomédica. Diseño sistemas de sensado, prototipos y soluciones hardware-software para observar, medir y entender fenómenos reales",
+      eyebrow: "Ingeniería física · Instrumentación · Ciencia de datos",
+      titleStart: "Instrumentación y ciencia de datos",
+      titleAccent: "para decidir con evidencia.",
+      body: "Ingeniero Físico con énfasis en instrumentación electrónica e IoT, y con formación en ciencia de datos e inteligencia artificial. Diseño sistemas de sensado y los complemento con análisis de datos, Machine Learning e IA generativa para observar, medir, modelar y entender fenómenos reales.",
       cta: "Explorar proyectos",
       secondary: "Ver capacidades",
       available: "Disponible para proyectos de ingeniería e investigación",
-      chips: ["Instrumentación eléctrica", "Sistemas biomédicos", "Investigación aplicada"],
+      chips: ["Instrumentación e IoT", "Ciencia de datos e IA", "Sistemas biomédicos", "Investigación aplicada"],
     },
     focus: {
       eyebrow: "Áreas de competencia",
@@ -85,7 +93,7 @@ const copy = {
         { icon: RadioTower, number: "01", title: "Sensado Y monitoreo", visuals: [assets.network], body: "Adquisición de variables ambientales, sistemas IoT y lectura de señales para apoyar decisiones técnicas." },
         { icon: CircuitBoard, number: "02", title: "Electrónica aplicada", visuals: [assets.coupling], body: "Prototipos, PCB, integración de sensores, actuadores, microcontroladores y pruebas de funcionamiento." },
         { icon: Microscope, number: "03", title: "Instrumentación biomédica", visuals: [assets.biomedical, assets.workshop], body: "Formación y experiencia en sistemas de medición y equipos biomédicos con foco en trazabilidad." },
-        { icon: Code2, number: "04", title: "Modelado Y software", visuals: [assets.model3d, assets.codeVisual], body: "Python, C++, MATLAB, Simulink y herramientas de desarrollo para llevar una hipótesis a un sistema verificable." },
+        { icon: Database, number: "04", title: "Ciencia de datos e IA", visuals: [assets.dsAi, assets.dsAnalytics], body: "Python, Machine Learning, Deep Learning e IA generativa, junto con MATLAB y Simulink, para convertir datos medidos en modelos y decisiones." },
       ],
     },
     research: {
@@ -104,7 +112,7 @@ const copy = {
       eyebrow: "Selección de trabajo",
       title: "Prototipos con contexto.",
       body: "Una selección de sistemas, placas y experimentos que muestran cómo paso de la idea a la medición, el ensamblaje y la validación.",
-      filters: { instrumentation: "Instrumentación", electronics: "Electrónica", robotics: "Robótica" },
+      filters: { datascience: "Ciencia de datos", instrumentation: "Instrumentación", electronics: "Electrónica", robotics: "Robótica" },
       projects: [
         { id: "sensor", filter: "instrumentation" as ProjectFilter, index: "01", title: "Nodo de sensado ambiental", category: "Instrumentación · IoT", body: "Prototipo para medir formaldehído, CO₂, temperatura y humedad con visualización y adquisición de datos.", image: assets.sensorPrototype, gallery: [assets.sensorPrototype, assets.sensor, assets.sensorSetup], accent: "cyan" },
         { id: "robot", filter: "robotics" as ProjectFilter, index: "02", title: "Bot Pool · Robot de fútbol", category: "Robótica · Prototipado", body: "Diseño y ensamblaje de un robot competitivo, explorando estructura, electrónica y control en un sistema compacto.", image: assets.robot, gallery: [assets.robot, assets.robotAlt, assets.robotThird], galleryCaptions: ["Bot Pool en configuración de competencia", "Detalle del chasis y la electrónica del robot", "Vista del robot durante las pruebas de funcionamiento"], accent: "orange" },
@@ -114,7 +122,39 @@ const copy = {
         { id: "lab", filter: "electronics" as ProjectFilter, index: "06", title: "Laboratorio de prototipos", category: "Laboratorio · Ingeniería", body: "Un registro visual de iteraciones, pruebas y configuraciones construidas durante el desarrollo de prototipos.", image: assets.prototypes, gallery: [assets.prototypes, assets.pcbSecond, assets.pcbSolded], accent: "orange" },
         { id: "biomedical", filter: "instrumentation" as ProjectFilter, index: "07", title: "Instrumentación biomédica", category: "Biomédica · Concepto", body: "Reconocimiento, Gestion, manejo y uso de equipos biomédicos en el sector de la salud.", image: assets.biomedical, gallery: [assets.biomedical, assets.workshop], accent: "green" },
         { id: "aerospace", filter: "robotics" as ProjectFilter, index: "08", title: "Cargas útiles aeroespaciales", category: "Aeroespacial · CanSat", body: "CanSat desarrollado para explorar electrónica, adquisición de datos y calidad del aire en el contexto de ENMICE 2025.", image: assets.aerospace, gallery: [assets.aerospace, assets.cansat, assets.cansatComplete, assets.cansatElectronics, assets.enmice], galleryCaptions: ["Visual conceptual de una carga útil aeroespacial", "CanSat utilizado en el proyecto", "CanSat completo con su estructura integrada", "Electrónica y sistema de adquisición del CanSat", "Participación en la competencia ENMICE 2025"], accent: "purple" },
+        { id: "emg", filter: "datascience" as ProjectFilter, index: "09", title: "Machine Learning con señales EMG", category: "Ciencia de datos · Biomédica", body: "Modelos de Machine Learning sobre señales electromiográficas para identificar la evolución de la enfermedad de Parkinson.", image: assets.dsHumanAi, gallery: [assets.dsHumanAi, assets.dsAi], galleryCaptions: ["Imagen ilustrativa: persona e inteligencia artificial", "Imagen ilustrativa: modelo de IA sobre datos"], accent: "cyan" },
+        { id: "cells", filter: "datascience" as ProjectFilter, index: "10", title: "Clasificación de células sanguíneas", category: "Ciencia de datos · Imágenes", body: "Clasificación de células sanguíneas a partir de imágenes, combinando procesamiento óptico digital y Machine Learning.", image: assets.dsAnalytics, gallery: [assets.dsAnalytics, assets.dsGlobal], galleryCaptions: ["Imagen ilustrativa: paneles de análisis de datos", "Imagen ilustrativa: datos a escala global"], accent: "cyan" },
+        { id: "spectra", filter: "datascience" as ProjectFilter, index: "11", title: "Regresión sobre espectros de transmitancia", category: "Ciencia de datos · Materiales", body: "Regresión lineal aplicada a espectros de transmitancia para predecir la posición espectral de un material (número de onda o longitud de onda).", image: assets.dsGlobe, gallery: [assets.dsGlobe, assets.dsAnalytics], galleryCaptions: ["Imagen ilustrativa: datos y señales conectados", "Imagen ilustrativa: gráficas y tableros de análisis"], accent: "cyan" },
+        { id: "genai", filter: "datascience" as ProjectFilter, index: "12", title: "Ruta de IA generativa y ciencia de datos", category: "IA generativa · En progreso", body: "Formación en curso para llevar el análisis de datos con Python hacia modelos de Machine Learning e IA generativa aplicados a ingeniería.", image: assets.dsAi, gallery: [assets.dsAi, assets.dsHumanAi, assets.dsGlobal], galleryCaptions: ["Imagen ilustrativa: chip de inteligencia artificial", "Imagen ilustrativa: colaboración persona e IA", "Imagen ilustrativa: ciencia de datos global"], accent: "cyan" },
       ],
+    },
+    ds: {
+      eyebrow: "Ciencia de datos e IA",
+      title: "De los datos medidos a modelos que predicen.",
+      lead: "Complemento la instrumentación con ciencia de datos: adquiero variables físicas, las preparo, las modelo con Machine Learning y las comunico con claridad. Línea de énfasis en Ciencia de Datos y Machine Learning · Ingeniería Física, Universidad del Cauca (2023 — 2024).",
+      visualAlts: ["Chip de inteligencia artificial y paneles de datos", "Red global de datos conectados", "Análisis de datos con inteligencia artificial"],
+      badge: "Python · ML · IA generativa",
+      pipelineTitle: "Del sensor al modelo",
+      steps: [
+        { n: "01", title: "Adquisición", body: "Sensores, microcontroladores y señales biomédicas como fuente de datos reales." },
+        { n: "02", title: "Preparación", body: "Estructuración y análisis de datos con Python en Google Colab, VS Code y Anaconda." },
+        { n: "03", title: "Modelado", body: "Random Forest, árboles de decisión, K-means, KNN, boosting y regresión." },
+        { n: "04", title: "Validación", body: "Grid Search y estrategias para evitar el sobreajuste de los datos." },
+        { n: "05", title: "Comunicación", body: "Gráficas, ponencias y documentación técnica para apoyar decisiones." },
+      ],
+      casesTitle: "Casos de aplicación",
+      cases: [
+        { tag: "Biomédica · ML", title: "Señales EMG y Parkinson", body: "Machine Learning con señales electromiográficas para identificar la evolución de la enfermedad." },
+        { tag: "Imágenes · Clasificación", title: "Células sanguíneas", body: "Clasificación a partir de imágenes mediante procesamiento óptico digital." },
+        { tag: "Materiales · Regresión", title: "Espectros de transmitancia", body: "Regresión lineal para predecir la posición espectral de un material." },
+        { tag: "IoT · Análisis", title: "Sensado ambiental", body: "Adquisición y análisis de datos de formaldehído, CO₂, temperatura y humedad." },
+      ],
+      stackTitle: "Herramientas y técnicas",
+      stack: ["Python", "Machine Learning", "Deep Learning", "IA generativa", "Random Forest", "KNN · K-means", "Gradient Boosting", "Grid Search", "Google Colab", "Anaconda", "VS Code · Cursor", "MATLAB"],
+      learningTitle: "Formación en progreso",
+      learning: ["Data Science & AI Masters 2026: From Python to Gen AI · Udemy", "Ciencia de Datos · Cisco Networking Academy", "Inteligencia Artificial Generativa · Cisco Networking Academy", "Cursos de IA · Claude Academy"],
+      cta: "Ver proyectos de datos",
+      cta2: "Conversemos sobre datos",
     },
     skills: {
       eyebrow: "Idiomas",
@@ -134,19 +174,19 @@ const copy = {
       email: "Escríbeme",
       form: { name: "Nombre", email: "Correo electrónico", message: "Cuéntame sobre el proyecto", send: "Enviar mensaje", success: "Mensaje enviado correctamente. Gracias por escribirme; te responderé pronto." },
     },
-    footer: "Ingeniero Físico · Instrumentación eléctrica, electrónica y biomédica",
+    footer: "Ingeniero Físico · Instrumentación, electrónica, biomédica y ciencia de datos",
   },
   en: {
-    nav: { home: "Home", focus: "Focus", research: "Research", work: "Projects", skills: "Languages", contact: "Contact" },
+    nav: { home: "Home", focus: "Focus", research: "Research", work: "Projects", datascience: "Data & AI", skills: "Languages", contact: "Contact" },
     hero: {
-      eyebrow: "Physics engineering · Applied research",
-      titleStart: "Instrumentation that",
-      titleAccent: "turns data into decisions.",
-      body: "Physics Engineer focused on instrumentation, electronics, electrical and biomedical engineering. I design sensing systems, prototypes and hardware-software solutions to observe, measure and understand real-world phenomena.",
+      eyebrow: "Physics engineering · Instrumentation · Data science",
+      titleStart: "Instrumentation and data science",
+      titleAccent: "to decide with evidence.",
+      body: "Physics Engineer focused on electronic instrumentation and IoT, with training in data science and artificial intelligence. I design sensing systems and complement them with data analysis, Machine Learning and generative AI to observe, measure, model and understand real-world phenomena.",
       cta: "Explore projects",
       secondary: "View capabilities",
       available: "Available for engineering and research projects",
-      chips: ["Instrumentación eléctrica", "Sistemas biomédicos", "Investigación aplicada"],
+      chips: ["Instrumentation & IoT", "Data science & AI", "Biomedical systems", "Applied research"],
     },
     focus: {
       eyebrow: "Areas of competence",
@@ -156,7 +196,7 @@ const copy = {
         { icon: RadioTower, number: "01", title: "Sensing & monitoring", visuals: [assets.network], body: "Acquisition of environmental variables, IoT systems and signal reading to support technical decisions." },
         { icon: CircuitBoard, number: "02", title: "Applied electronics", visuals: [assets.coupling], body: "Prototypes, PCBs, sensor and actuator integration, microcontrollers and functional testing." },
         { icon: Microscope, number: "03", title: "Biomedical instrumentation", visuals: [assets.biomedical, assets.workshop], body: "Training and experience with measurement systems and biomedical equipment, with a focus on traceability." },
-        { icon: Code2, number: "04", title: "Modeling & software", visuals: [assets.model3d, assets.codeVisual], body: "Python, C++, MATLAB, Simulink and development tools to turn a hypothesis into a verifiable system." },
+        { icon: Database, number: "04", title: "Data science & AI", visuals: [assets.dsAi, assets.dsAnalytics], body: "Python, Machine Learning, Deep Learning and generative AI, together with MATLAB and Simulink, to turn measured data into models and decisions." },
       ],
     },
     research: {
@@ -175,7 +215,7 @@ const copy = {
       eyebrow: "Selected work",
       title: "Prototypes with context.",
       body: "A selection of systems, boards and experiments showing how I move from an idea to measurement, assembly and validation.",
-      filters: { instrumentation: "Instrumentation", electronics: "Electronics", robotics: "Robotics" },
+      filters: { datascience: "Data science", instrumentation: "Instrumentation", electronics: "Electronics", robotics: "Robotics" },
       projects: [
         { id: "sensor", filter: "instrumentation" as ProjectFilter, index: "01", title: "Environmental sensing node", category: "Instrumentation · IoT", body: "Prototype measuring formaldehyde, CO₂, temperature and humidity with visualization and data acquisition.", image: assets.sensorPrototype, gallery: [assets.sensorPrototype, assets.sensor, assets.sensorSetup], accent: "cyan" },
         { id: "robot", filter: "robotics" as ProjectFilter, index: "02", title: "Bot Pool · Football robot", category: "Robotics · Prototyping", body: "Design and assembly of a competitive robot exploring structure, electronics and control in a compact system.", image: assets.robot, gallery: [assets.robot, assets.robotAlt, assets.robotThird], galleryCaptions: ["Bot Pool in competition configuration", "Robot chassis and electronics detail", "Robot view during functional testing"], accent: "orange" },
@@ -185,7 +225,39 @@ const copy = {
         { id: "lab", filter: "electronics" as ProjectFilter, index: "06", title: "Prototype lab", category: "Laboratory · Engineering", body: "A visual record of iterations, tests and configurations built during prototype development.", image: assets.prototypes, gallery: [assets.prototypes, assets.pcbSecond, assets.pcbSolded], accent: "orange" },
         { id: "biomedical", filter: "instrumentation" as ProjectFilter, index: "07", title: "Biomedical instrumentation", category: "Biomedical · Concept", body: "Identification, management, handling, and use of biomedical equipment in the healthcare sector.", image: assets.biomedical, gallery: [assets.biomedical, assets.workshop], accent: "green" },
         { id: "aerospace", filter: "robotics" as ProjectFilter, index: "08", title: "Aerospace payloads", category: "Aerospace · CanSat", body: "CanSat developed to explore electronics, data acquisition and air quality in the context of ENMICE 2025.", image: assets.aerospace, gallery: [assets.aerospace, assets.cansat, assets.cansatComplete, assets.cansatElectronics, assets.enmice], galleryCaptions: ["Concept visual of an aerospace payload", "CanSat used in the project", "Complete CanSat with its integrated structure", "CanSat electronics and data-acquisition system", "Participation in the ENMICE 2025 competition"], accent: "purple" },
+        { id: "emg", filter: "datascience" as ProjectFilter, index: "09", title: "Machine Learning on EMG signals", category: "Data science · Biomedical", body: "Machine Learning models on electromyographic signals to identify the progression of Parkinson’s disease.", image: assets.dsHumanAi, gallery: [assets.dsHumanAi, assets.dsAi], galleryCaptions: ["Illustrative image: person and artificial intelligence", "Illustrative image: AI model over data"], accent: "cyan" },
+        { id: "cells", filter: "datascience" as ProjectFilter, index: "10", title: "Blood cell classification", category: "Data science · Imaging", body: "Blood cell classification from images, combining digital optical processing and Machine Learning.", image: assets.dsAnalytics, gallery: [assets.dsAnalytics, assets.dsGlobal], galleryCaptions: ["Illustrative image: data analysis panels", "Illustrative image: data at global scale"], accent: "cyan" },
+        { id: "spectra", filter: "datascience" as ProjectFilter, index: "11", title: "Regression on transmittance spectra", category: "Data science · Materials", body: "Linear regression on transmittance spectra to predict the spectral position of a material (wavenumber or wavelength).", image: assets.dsGlobe, gallery: [assets.dsGlobe, assets.dsAnalytics], galleryCaptions: ["Illustrative image: connected data and signals", "Illustrative image: charts and analytics dashboards"], accent: "cyan" },
+        { id: "genai", filter: "datascience" as ProjectFilter, index: "12", title: "Generative AI & data science path", category: "Generative AI · In progress", body: "Ongoing training to take Python data analysis toward Machine Learning and generative AI applied to engineering.", image: assets.dsAi, gallery: [assets.dsAi, assets.dsHumanAi, assets.dsGlobal], galleryCaptions: ["Illustrative image: AI chip", "Illustrative image: person and AI collaboration", "Illustrative image: global data science"], accent: "cyan" },
       ],
+    },
+    ds: {
+      eyebrow: "Data science & AI",
+      title: "From measured data to models that predict.",
+      lead: "I complement instrumentation with data science: I acquire physical variables, prepare them, model them with Machine Learning and communicate the results clearly. Emphasis track in Data Science and Machine Learning · Physics Engineering, Universidad del Cauca (2023 — 2024).",
+      visualAlts: ["Artificial intelligence chip and data panels", "Global network of connected data", "Data analysis with artificial intelligence"],
+      badge: "Python · ML · Generative AI",
+      pipelineTitle: "From sensor to model",
+      steps: [
+        { n: "01", title: "Acquisition", body: "Sensors, microcontrollers and biomedical signals as a source of real data." },
+        { n: "02", title: "Preparation", body: "Data structuring and analysis with Python in Google Colab, VS Code and Anaconda." },
+        { n: "03", title: "Modeling", body: "Random Forest, decision trees, K-means, KNN, boosting and regression." },
+        { n: "04", title: "Validation", body: "Grid Search and strategies to avoid overfitting." },
+        { n: "05", title: "Communication", body: "Charts, talks and technical documentation to support decisions." },
+      ],
+      casesTitle: "Application cases",
+      cases: [
+        { tag: "Biomedical · ML", title: "EMG signals & Parkinson’s", body: "Machine Learning on electromyographic signals to identify disease progression." },
+        { tag: "Imaging · Classification", title: "Blood cells", body: "Image-based classification using digital optical processing." },
+        { tag: "Materials · Regression", title: "Transmittance spectra", body: "Linear regression to predict the spectral position of a material." },
+        { tag: "IoT · Analysis", title: "Environmental sensing", body: "Acquisition and analysis of formaldehyde, CO₂, temperature and humidity data." },
+      ],
+      stackTitle: "Tools & techniques",
+      stack: ["Python", "Machine Learning", "Deep Learning", "Generative AI", "Random Forest", "KNN · K-means", "Gradient Boosting", "Grid Search", "Google Colab", "Anaconda", "VS Code · Cursor", "MATLAB"],
+      learningTitle: "Training in progress",
+      learning: ["Data Science & AI Masters 2026: From Python to Gen AI · Udemy", "Data Science · Cisco Networking Academy", "Generative Artificial Intelligence · Cisco Networking Academy", "AI courses · Claude Academy"],
+      cta: "View data projects",
+      cta2: "Let’s talk about data",
     },
     skills: {
       eyebrow: "Technical stack",
@@ -205,7 +277,7 @@ const copy = {
       email: "Write to me",
       form: { name: "Name", email: "Email address", message: "Tell me about the project", send: "Send message", success: "Message sent successfully. Thank you for reaching out; I will reply soon." },
     },
-    footer: "Physics Engineer · Electrical, electronic & biomedical instrumentation",
+    footer: "Physics Engineer · Instrumentation, electronics, biomedical & data science",
   },
 };
 
@@ -231,7 +303,7 @@ function SectionIntro({ eyebrow, title, body, light = false }: { eyebrow: string
 export default function Home() {
   const [language, setLanguage] = useState<Language>("es");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [filter, setFilter] = useState<ProjectFilter>("instrumentation");
+  const [filter, setFilter] = useState<ProjectFilter>("datascience");
   const [sent, setSent] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
@@ -259,6 +331,7 @@ export default function Home() {
     ["#focus", t.nav.focus],
     ["#research", t.nav.research],
     ["#work", t.nav.work],
+    ["#datascience", t.nav.datascience],
     ["#skills", t.nav.skills],
     ["#contact", t.nav.contact],
   ];
@@ -315,7 +388,7 @@ export default function Home() {
           <div className="hero-bottom">
             <div className="hero-scroll"><span>{language === "es" ? "DESPLÁZATE PARA EXPLORAR" : "SCROLL TO EXPLORE"}</span><ChevronDown size={15} /></div>
             <div className="hero-chips">{t.hero.chips.map((chip) => <span key={chip}>{chip}</span>)}</div>
-            <div className="hero-index">01 <span>/</span> 06</div>
+            <div className="hero-index">01 <span>/</span> 07</div>
           </div>
         </section>
 
@@ -372,7 +445,7 @@ export default function Home() {
                   <button key={key} className={filter === key ? "active" : ""} onClick={() => setFilter(key)} role="tab" aria-selected={filter === key}>{t.work.filters[key]}</button>
                 ))}
               </div>
-              <span className="project-count">0{filteredProjects.length} / 08</span>
+              <span className="project-count">{String(filteredProjects.length).padStart(2, "0")} / {String(t.work.projects.length).padStart(2, "0")}</span>
             </div>
             <div className="projects-grid">
               {filteredProjects.map((project) => {
@@ -393,6 +466,38 @@ export default function Home() {
                 </article>
                 );
               })}
+            </div>
+          </div>
+        </section>
+
+        <section id="datascience" className="section ds-section">
+          <div className="container">
+            <SectionIntro eyebrow={t.ds.eyebrow} title={t.ds.title} body={t.ds.lead} />
+            <div className="ds-showcase">
+              <div className="ds-mosaic">
+                {[assets.dsAi, assets.dsGlobe, assets.dsAnalytics].map((src, index) => (
+                  <button key={src} type="button" className={`ds-tile ds-tile-${index + 1}`} onClick={() => setLightbox({ src, alt: t.ds.visualAlts[index] })} aria-label={`${language === "es" ? "Ampliar" : "View"} ${t.ds.visualAlts[index]}`}><img src={src} alt={t.ds.visualAlts[index]} loading="lazy" /></button>
+                ))}
+                <div className="ds-badge"><Sparkles size={14} />{t.ds.badge}</div>
+              </div>
+              <div className="ds-pipeline-wrap">
+                <p className="mini-label ds-label"><Activity size={14} />{t.ds.pipelineTitle}</p>
+                <ol className="ds-pipeline">
+                  {t.ds.steps.map((step) => <li key={step.n}><span className="ds-step-n">{step.n}</span><div><h3>{step.title}</h3><p>{step.body}</p></div></li>)}
+                </ol>
+              </div>
+            </div>
+            <p className="mini-label ds-label"><Layers size={14} />{t.ds.casesTitle}</p>
+            <div className="ds-cases">
+              {t.ds.cases.map((item) => <article className="ds-case" key={item.title}><p className="mini-label">{item.tag}</p><h3>{item.title}</h3><p>{item.body}</p></article>)}
+            </div>
+            <div className="ds-lower">
+              <div><p className="mini-label ds-label"><Code2 size={14} />{t.ds.stackTitle}</p><div className="tag-list">{t.ds.stack.map((item) => <span key={item}>{item}</span>)}</div></div>
+              <div><p className="mini-label ds-label"><GraduationCap size={14} />{t.ds.learningTitle}</p><ul className="ds-learning">{t.ds.learning.map((item) => <li key={item}><Check size={14} />{item}</li>)}</ul></div>
+            </div>
+            <div className="ds-actions">
+              <a className="button button-primary" href="#work" onClick={() => setFilter("datascience")}>{t.ds.cta}<ArrowDownRight size={17} /></a>
+              <a className="text-link" href="#contact">{t.ds.cta2}<ArrowUpRight size={16} /></a>
             </div>
           </div>
         </section>
@@ -419,3 +524,4 @@ export default function Home() {
     </div>
   );
 }
+
